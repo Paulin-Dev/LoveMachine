@@ -11,7 +11,7 @@ private:
 	unsigned int question_nb = QUESTION_ASKED_NB;
 	unsigned int question_asked;
 	unsigned int questions[QUESTION_ASKED_NB];
-
+	bool ended;
 	unsigned int points;
 	std::chrono::system_clock::time_point last_question;
 public:
@@ -23,6 +23,7 @@ public:
 	unsigned int getTimeElapsed();
 	unsigned int getTimeLeft();
 	bool nextQuestion();
+	void end();
 	unsigned int getCurrentQuestion();
 
 	Game();

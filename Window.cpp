@@ -4,12 +4,13 @@
 
 const std::string MODEL_PATH                 = "C:/Users/Paulin/Documents/IA/Love Machine/models/centerface.onnx";
 
-const std::string MARKER_DIR_PATH            = "C:/Users/Paulin/Documents/IA/Love Machine/assets/marker/";
+const std::string MARKER_DIR_PATH            = "C:/Users/Paulin/Documents/IA/Love Machine/assets/marker2/";
 const std::string TRANSITION_BEFORE_DIR_PATH = "C:/Users/Paulin/Documents/IA/Love Machine/assets/transition_before/";
 const std::string TRANSITION_AFTER_DIR_PATH  = "C:/Users/Paulin/Documents/IA/Love Machine/assets/transition_after/";
 const std::string QUESTIONS_DIR_PATH         = "C:/Users/Paulin/Documents/IA/Love Machine/assets/questions/";
 const std::string COUNTDOWN_3_DIR_PATH       = "C:/Users/Paulin/Documents/IA/Love Machine/assets/countdown_3/";
 const std::string SAVES_DIR_PATH             = "C:/Users/Paulin/Documents/IA/Love Machine/assets/saves/";
+const char* SORT_SCRIPT                      = "python C:/Users/Paulin/Documents/IA/\"Love Machine\"/assets/saves/sort.py";
 const std::string MIDDLE_BAR_PATH            = "C:/Users/Paulin/Documents/IA/Love Machine/assets/middle_bar.png";
 const std::string RESULTS_DIR_PATH           = "C:/Users/Paulin/Documents/IA/Love Machine/assets/results/";
 const std::string ANSWERS_JSON_PATH          = "C:/Users/Paulin/Documents/IA/Love Machine/answers.json";
@@ -24,6 +25,9 @@ const cv::Vec3b TRANSITION_COLOR             = cv::Vec3b(214, 200, 251);
 const cv::Vec3b COUNTDOWN_COLOR              = cv::Vec3b(214, 200, 251);
 const cv::Vec3b MARKER_COLOR                 = cv::Vec3b(140, 136, 203);
 
+// https://colorpalettes.net/color-palette-1902/
+
+
 void Window::run() {
 	cv::namedWindow(this->title, cv::WND_PROP_FULLSCREEN);
 	cv::setWindowProperty(this->title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
@@ -37,12 +41,6 @@ void Window::run() {
 	while (this->running) {
 
 		this->camera.read(frame);
-		
-		if (!this->camera.analysing){
-			this->camera.analysing = true;
-			std::thread th(&Window::startAnalyse, this, frame);
-			th.detach();
-		}
 
 		switch (cv::waitKey(1))
 		{
@@ -51,7 +49,6 @@ void Window::run() {
 			break;
 		case 32: // space
 			if (!this->game_started) {
-				this->game_started = true;
 				std::thread gth(&Window::newGame, this);
 				gth.detach();
 			}
@@ -60,12 +57,24 @@ void Window::run() {
 			break;
 		}
 
-		this->limitFaces();
-		this->drawMarker(frame);
-		//this->saved_frame = frame.clone();
-		this->playAnimations(frame);
-		
-		cv::imshow(this->title, frame);
+		if (!frame.empty()) {
+			if (!this->camera.analysing) {
+			this->camera.analysing = true;
+			std::thread th(&Window::startAnalyse, this, frame);
+			th.detach();
+		}
+
+			this->limitFaces();
+			this->drawMarker(frame);
+			this->playAnimations(frame);
+
+			if (this->save_frame) {
+				this->saved_frame = frame.clone();
+				this->save_frame = false;
+			}
+
+			cv::imshow(this->title, frame);
+		}
 	}
 
 	this->camera.release();
@@ -177,6 +186,8 @@ void Window::playAnimations(cv::Mat frame) {
 		if (this->displayEmoji(frame)) {
 			this->play_results = false;
 			this->game_started = false;
+			system(SORT_SCRIPT);
+			this->game.end();
 		}
 		return;
 	}
@@ -184,6 +195,7 @@ void Window::playAnimations(cv::Mat frame) {
 	if (this->game_started && !this->play_transition_before && !this->play_transition_after && !this->play_countdown && !this->play_results) {
 
 		if (this->game.nextQuestion()) {
+			std::cout << "YES " << this->game.nextQuestion() << std::endl;
 			this->addPoints();
 
 			if (this->game.isOver()) {
@@ -191,6 +203,7 @@ void Window::playAnimations(cv::Mat frame) {
 				this->play_transition_before = true;
 				this->play_transition_after = true;
 				this->play_results = true;
+				this->takePicture(5.5);
 			}
 			else {
 				this->play_transition_before = true;
@@ -214,6 +227,7 @@ bool Window::displayGif(cv::Mat frame, std::string gif_directory, std::string ty
 	else if (type == "countdown") {
 		cv::resize(gif_frame, gif_frame, cv::Size((frame.rows * gif_frame.cols) / gif_frame.rows, frame.rows));
 		color = COUNTDOWN_COLOR;
+		Sleep(10);
 	}
 	int x = (frame.cols / 2) - (gif_frame.cols / 2);
 	int y = (frame.rows / 2) - (gif_frame.rows / 2);
@@ -257,13 +271,13 @@ bool Window::displayEmoji(cv::Mat frame) {
 	}
 
 	this->gif_index++;
+	Sleep(10);
 	return false;
 }
 
 void Window::displayQuestion() {
 
 	int question_id = this->game.newQuestion();
-
 	question_id = 0;
 
 	cv::VideoCapture cap(QUESTIONS_DIR_PATH + std::to_string(question_id) + ".mp4");
@@ -294,19 +308,29 @@ void Window::displayQuestion() {
 	this->play_transition_after = true;
 	this->play_answers = true;
 
+	this->takePicture(3.5);
+
 	this->middle_bar = cv::imread(MIDDLE_BAR_PATH);
 	cv::resize(this->middle_bar, this->middle_bar, cv::Size((this->middle_bar.cols * this->camera.getHeight() - (this->camera.getHeight() - this->camera.getHeight() / 8)) / this->middle_bar.rows, this->camera.getHeight() - this->camera.getHeight() / 8));
 }
 
-void Window::saveFrame() {
-	Sleep(2000);
+void Window::takePicture(double seconds) {
+	std::thread sth(&Window::saveFrame, this, seconds);
+	sth.detach();
+}
+
+void Window::saveFrame(double seconds) {
+	Sleep(seconds*1000);
 	time_t t;
 	time(&t);
 	struct tm* tmp;
 	tmp = localtime(&t);
 	char output[20];
 	strftime(output, sizeof(output), "%d-%m-%Y %H-%M-%S", tmp);
+	this->save_frame = true;
+	Sleep(100);
 	cv::imwrite(SAVES_DIR_PATH + output + ".png", this->saved_frame);
+	std::cout << "saved as " << SAVES_DIR_PATH + output + ".png" << std::endl;
 }
 
 void Window::displayAnswers(cv::Mat frame) {
@@ -357,6 +381,7 @@ void Window::displayAnswers(cv::Mat frame) {
 
 void Window::newGame() {
 	this->play_countdown = true;
+	this->game_started = true;
 	this->gif_index = 0;
 	while (this->play_countdown) {
 		Sleep(500);

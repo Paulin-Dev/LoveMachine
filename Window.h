@@ -28,6 +28,7 @@ private:
 	bool play_countdown;
 	bool play_answers;
 	bool play_results;
+	bool save_frame;
 
 	cv::Mat middle_bar;
 	
@@ -45,7 +46,8 @@ public:
 	bool displayGif(cv::Mat, std::string, std::string);
 	bool displayEmoji(cv::Mat);
 	void displayQuestion();
-	void saveFrame();
+	void takePicture(double);
+	void saveFrame(double);
 	void displayAnswers(cv::Mat);
 	void newGame();
 	bool sameSide();

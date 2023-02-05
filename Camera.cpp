@@ -36,11 +36,19 @@ void Camera::release() {
 Camera::Camera() {}
 
 Camera::Camera(int camera_id, std::string model_path) {
-	this->capture = cv::VideoCapture(camera_id);
+	this->capture = cv::VideoCapture(camera_id, cv::CAP_DSHOW);
 	this->capture.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
 	this->capture.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
+	this->capture.set(cv::CAP_PROP_FPS, 60);
+	this->capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
 
-	std::cout << this->capture.get(cv::CAP_PROP_FRAME_WIDTH) << "x" << this->capture.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
+	std::cout << this->capture.get(cv::CAP_PROP_FRAME_WIDTH) << "x" << this->capture.get(cv::CAP_PROP_FRAME_HEIGHT) << " " << this->capture.get(cv::CAP_PROP_FPS) << " fps" << std::endl;
 
-	this->centerface = Centerface(model_path, this->getWidth()/4, this->getHeight()/4);
+	this->centerface = Centerface(model_path, this->getWidth() / 4, this->getHeight() / 4);
+}
+
+Camera::Camera(Camera& camera) {
+	this->capture = camera.capture;
+	this->centerface = camera.centerface;
+	this->face_info = camera.face_info;
 }

@@ -41,7 +41,12 @@ unsigned int Game::getTimeLeft() {
 }
 
 bool Game::nextQuestion() {
-	return this->getTimeElapsed() == ANSWER_TIME;
+	std::cout << this->getTimeElapsed() << " ended=" << this->ended << std::endl;
+	return this->getTimeElapsed() < 12 && this->getTimeElapsed() >= ANSWER_TIME && !this->ended;
+}
+
+void Game::end() {
+	this->ended = true;
 }
 
 unsigned int Game::getCurrentQuestion() {
