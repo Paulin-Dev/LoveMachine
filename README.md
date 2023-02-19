@@ -13,7 +13,8 @@ It uses [OpenCV](https://github.com/opencv/opencv), [CenterFace](https://github.
 Project for [Métropole Rouen Normandie](https://www.linkedin.com/company/metropole-rouen-normandie/) and [Science Action Normandie](https://www.linkedin.com/company/science-action-normandie/)  
 With the help of **Antoine**  
 
->*Designed to work with 60fps 1920x1080 displays. You might experience some lags depending on your hardware.*
+>*Designed to work with 60fps 1920x1080 webcams. You might experience some lags depending on your hardware.  
+Tested on Windows **with OpenCV installed**.*
 
 ## MIT License
 
