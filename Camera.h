@@ -24,11 +24,4 @@ public:
 	Camera();
 	Camera(int, std::string);
 	Camera(Camera &camera);
-
-	/*
-	friend std::ostream& operator<<(std::ostream& os, Camera camera) {
-		os << "Camera : " << camera.analysing << std::endl;
-		return os;
-	};
-	*/
 };

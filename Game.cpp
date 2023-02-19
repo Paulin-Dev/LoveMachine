@@ -1,7 +1,7 @@
 #include "Game.h"
 
-const unsigned int TOTAL_QUESTION_NB = 100;
-const unsigned int ANSWER_TIME       = 4; // seconds
+const unsigned int TOTAL_QUESTION_NB = 125;
+const unsigned int ANSWER_TIME       = 7;     // seconds
 
 
 unsigned int Game::newQuestion() {
@@ -41,8 +41,7 @@ unsigned int Game::getTimeLeft() {
 }
 
 bool Game::nextQuestion() {
-	std::cout << this->getTimeElapsed() << " ended=" << this->ended << std::endl;
-	return this->getTimeElapsed() < 12 && this->getTimeElapsed() >= ANSWER_TIME && !this->ended;
+	return this->getTimeElapsed() < 15 && this->getTimeElapsed() >= ANSWER_TIME && !this->ended;
 }
 
 void Game::end() {
@@ -59,4 +58,5 @@ Game::Game() {
 		this->questions[i] = TOTAL_QUESTION_NB+1;
 	}
 	this->points = 0;
+	this->ended = false;
 }

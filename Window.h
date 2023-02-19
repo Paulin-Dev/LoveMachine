@@ -17,7 +17,6 @@ private:
 	Camera camera;
 	std::vector<FaceInfo> backup;
 	Game game;
-	cv::Mat saved_frame;
 
 	unsigned int marker_index;
 
@@ -28,7 +27,6 @@ private:
 	bool play_countdown;
 	bool play_answers;
 	bool play_results;
-	bool save_frame;
 
 	cv::Mat middle_bar;
 	
@@ -46,13 +44,10 @@ public:
 	bool displayGif(cv::Mat, std::string, std::string);
 	bool displayEmoji(cv::Mat);
 	void displayQuestion();
-	void takePicture(double);
-	void saveFrame(double);
 	void displayAnswers(cv::Mat);
 	void newGame();
 	bool sameSide();
 	void addPoints();
-	//void displayResults(cv::Mat);
 
 	Window(std::string, unsigned int);
 };
