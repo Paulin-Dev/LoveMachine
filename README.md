@@ -6,7 +6,7 @@ Detects up to 2 faces with a webcam. By pressing the space bar, a new quiz conta
 
 
 <img src="resources/demo.gif">  
-<br><br>
+<br>
 
 It uses [OpenCV](https://github.com/opencv/opencv), [CenterFace](https://github.com/Star-Clouds/CenterFace) and [JSON for Modern C++](https://github.com/nlohmann/json)
 
@@ -14,8 +14,6 @@ Project for [Métropole Rouen Normandie](https://www.linkedin.com/company/metrop
 With the help of **Antoine**  
 
 >*Designed to work with 60fps 1920x1080 displays. You might experience some lags depending on your hardware.*
-
-<br>
 
 ## MIT License
 
