@@ -216,7 +216,6 @@ bool Window::displayGif(cv::Mat frame, std::string gif_directory, std::string ty
 	else if (type == "countdown") {
 		cv::resize(gif_frame, gif_frame, cv::Size((frame.rows * gif_frame.cols) / gif_frame.rows, frame.rows));
 		color = COUNTDOWN_COLOR;
-		Sleep(10);
 	}
 	int x = (frame.cols / 2) - (gif_frame.cols / 2);
 	int y = (frame.rows / 2) - (gif_frame.rows / 2);
@@ -260,7 +259,6 @@ bool Window::displayEmoji(cv::Mat frame) {
 	}
 
 	this->gif_index++;
-	Sleep(10);
 	return false;
 }
 
